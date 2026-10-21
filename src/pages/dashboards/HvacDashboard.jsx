@@ -7,22 +7,36 @@ export default function HvacDashboard({ user, setUser }) {
   const [techs, setTechs] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const [newTech, setNewTech] = useState({ name: '', certs: '', calId: '' });
-  const [newJob, setNewJob] = useState({ title: '', price: '', duration: '' });
+  const [newTech, setNewTech] = useState({ name: '', certs: '', vehicleId: 'VEH-01', calId: '', hours: '24/7' });
+  const [newJob, setNewJob] = useState({ title: '', price: '', duration: '', description: 'Standard Diagnostic' });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleAddTech = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newTech.name.trim() || !newTech.certs.trim() || !newTech.calId.trim()) {
+      setError('Please fill in technician name, certifications, and calendar email.');
+      return;
+    }
+    if (!emailRegex.test(newTech.calId.trim())) {
+      setError('Please enter a valid Google Calendar email address.');
+      return;
+    }
+
     setLoading(true);
     const techId = `TCH-${Date.now()}`;
-    const row = [techId, user.clientId, newTech.name, newTech.certs, "VEH-01", newTech.calId, "24/7", "ACTIVE"];
+    const row = [techId, user.clientId, newTech.name.trim(), newTech.certs.trim(), (newTech.vehicleId.trim() || "VEH-01"), newTech.calId.trim(), (newTech.hours.trim() || "24/7"), "ACTIVE"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Technicians', row);
       setTechs([...techs, { techId, ...newTech }]);
-      setNewTech({ name: '', certs: '', calId: '' });
+      setNewTech({ name: '', certs: '', vehicleId: 'VEH-01', calId: '', hours: '24/7' });
     } catch (err) {
-      alert('Failed to sync tech.');
+      setError(err?.message || 'Failed to sync technician.');
     } finally {
       setLoading(false);
     }
@@ -30,16 +44,23 @@ export default function HvacDashboard({ user, setUser }) {
 
   const handleAddJob = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newJob.title.trim() || !newJob.price || !newJob.duration) {
+      setError('Please fill in job title, base price, and duration.');
+      return;
+    }
+
     setLoading(true);
     const jobId = `JOB-${Date.now()}`;
-    const row = [jobId, user.clientId, newJob.title, newJob.price, newJob.duration, "TRUE", "Standard Diagnostic"];
+    const row = [jobId, user.clientId, newJob.title.trim(), String(newJob.price), String(newJob.duration), "TRUE", (newJob.description.trim() || "Standard Service")];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Jobs_Services', row);
       setJobs([...jobs, { jobId, ...newJob }]);
-      setNewJob({ title: '', price: '', duration: '' });
+      setNewJob({ title: '', price: '', duration: '', description: 'Standard Diagnostic' });
     } catch (err) {
-      alert('Failed to sync job.');
+      setError(err?.message || 'Failed to sync job.');
     } finally {
       setLoading(false);
     }

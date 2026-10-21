@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cpu, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Cpu, ShieldCheck, ArrowRight, Lock } from 'lucide-react';
 import { apiUpdateRegistry } from '../services/api';
 
 export default function DeployAgent({ user, setUser }) {
-  const [retellAgentId, setRetellAgentId] = useState(user?.retellAgentId || '');
   const [phoneNumber, setPhoneNumber] = useState(user?.assignedPhone || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+
   const handleDeploy = async (e) => {
     e.preventDefault();
     setError('');
 
-    const agentId = retellAgentId.trim();
-    const phone = phoneNumber.trim();
-    if (!agentId || !phone) {
-      setError('Retell Agent ID and inbound phone number are both required.');
+    const phone = phoneNumber.trim().replace(/[\s()-]/g, '');
+    if (!phoneRegex.test(phone)) {
+      setError('Please enter a valid phone number with country code (e.g., +12025550143).');
       return;
     }
+
+    // Agent ID is managed automatically based on industry niche
+    const agentId = user?.retellAgentId || 'agent_default_v1';
 
     setLoading(true);
     try {
@@ -49,7 +52,7 @@ export default function DeployAgent({ user, setUser }) {
             <Cpu className="w-6 h-6" />
           </div>
           <h2 className="text-2xl font-bold tracking-tight mb-2">Deploy Voice Agent Service</h2>
-          <p className="text-slate-400 text-xs">Connect your Retell AI Voice Agent and phone number to <span className="text-blue-400 font-bold">{user?.businessName}</span></p>
+          <p className="text-slate-400 text-xs">Connect your provisioned Retell AI Voice Agent and phone number to <span className="text-blue-400 font-bold">{user?.businessName}</span></p>
         </div>
 
         {error && (
@@ -60,12 +63,29 @@ export default function DeployAgent({ user, setUser }) {
 
         <form onSubmit={handleDeploy} className="space-y-4 text-xs">
           <div>
-            <label className="block uppercase tracking-wider text-slate-400 font-semibold mb-2">Retell AI Agent ID</label>
-            <input type="text" required value={retellAgentId} onChange={(e) => setRetellAgentId(e.target.value)} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl font-mono outline-none" placeholder="agent_38fbc9102c..." />
+            <label className="block uppercase tracking-wider text-slate-400 font-semibold mb-2 flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-blue-400" /> Assigned Retell AI Agent ID (Managed)
+            </label>
+            <input 
+              type="text" 
+              readOnly
+              disabled 
+              value={user?.retellAgentId || 'agent_default_v1'} 
+              className="w-full bg-slate-950/80 border border-slate-800 p-3 rounded-xl font-mono text-slate-400 cursor-not-allowed outline-none select-none" 
+            />
+            <p className="text-[11px] text-slate-500 mt-1">Automatically provisioned for <span className="text-slate-300 font-semibold">{user?.industry || 'your industry'}</span> and cannot be edited by the user.</p>
           </div>
           <div>
             <label className="block uppercase tracking-wider text-slate-400 font-semibold mb-2">Inbound Phone Number</label>
-            <input type="text" required value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl font-mono outline-none" placeholder="+1 (415) 888-9921" />
+            <input 
+              type="text" 
+              required 
+              value={phoneNumber} 
+              onChange={(e) => setPhoneNumber(e.target.value)} 
+              className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl font-mono outline-none focus:border-blue-500" 
+              placeholder="+12025550143" 
+            />
+            <p className="text-[11px] text-slate-500 mt-1">Enter your assigned phone number in E.164 format (e.g. +12025550143).</p>
           </div>
 
           <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">

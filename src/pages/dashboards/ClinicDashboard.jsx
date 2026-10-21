@@ -7,22 +7,36 @@ export default function ClinicDashboard({ user, setUser }) {
   const [doctors, setDoctors] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const [newDoc, setNewDoc] = useState({ name: '', specialty: '', license: '', calId: '', hours: '08:00-16:00' });
   const [newSvc, setNewSvc] = useState({ name: '', price: '', duration: '', instructions: '' });
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const handleAddDoctor = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newDoc.name.trim() || !newDoc.specialty.trim() || !newDoc.license.trim() || !newDoc.calId.trim()) {
+      setError('Please fill in all required doctor fields.');
+      return;
+    }
+    if (!emailRegex.test(newDoc.calId.trim())) {
+      setError('Please enter a valid Google Calendar email address.');
+      return;
+    }
+
     setLoading(true);
     const staffId = `STF-${Date.now()}`;
-    const row = [staffId, user.clientId, newDoc.name, newDoc.specialty, newDoc.license, newDoc.calId, newDoc.hours, "YES", "12", "ACTIVE"];
+    const row = [staffId, user.clientId, newDoc.name.trim(), newDoc.specialty.trim(), newDoc.license.trim(), newDoc.calId.trim(), newDoc.hours, "YES", "12", "ACTIVE"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Doctors_Staff', row);
       setDoctors([...doctors, { staffId, ...newDoc }]);
       setNewDoc({ name: '', specialty: '', license: '', calId: '', hours: '08:00-16:00' });
     } catch (err) {
-      alert('Failed to write record to Google Sheets.');
+      setError(err?.message || 'Failed to write record to Google Sheets.');
     } finally {
       setLoading(false);
     }
@@ -30,16 +44,23 @@ export default function ClinicDashboard({ user, setUser }) {
 
   const handleAddService = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newSvc.name.trim() || !newSvc.price || !newSvc.duration) {
+      setError('Please fill in service name, price, and duration.');
+      return;
+    }
+
     setLoading(true);
     const svcId = `SVC-${Date.now()}`;
-    const row = [svcId, user.clientId, newSvc.name, newSvc.price, newSvc.duration, (newSvc.instructions.trim() || "None"), "ALL", "TRUE", "Standard Treatment"];
+    const row = [svcId, user.clientId, newSvc.name.trim(), String(newSvc.price), String(newSvc.duration), (newSvc.instructions.trim() || "None"), "ALL", "TRUE", "Standard Treatment"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Services_Catalog', row);
       setServices([...services, { svcId, ...newSvc }]);
       setNewSvc({ name: '', price: '', duration: '', instructions: '' });
     } catch (err) {
-      alert('Failed to write service to Google Sheets.');
+      setError(err?.message || 'Failed to write service to Google Sheets.');
     } finally {
       setLoading(false);
     }
@@ -69,6 +90,12 @@ export default function ClinicDashboard({ user, setUser }) {
           </div>
           <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold"><ShieldCheck className="w-4 h-4" /> Live Webhook Active</span>
         </div>
+
+        {error && (
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium">
+            {error}
+          </div>
+        )}
 
         {activeTab === 'staff' && (
           <div className="space-y-6">

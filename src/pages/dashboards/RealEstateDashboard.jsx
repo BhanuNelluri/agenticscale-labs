@@ -7,34 +7,63 @@ export default function RealEstateDashboard({ user, setUser }) {
   const [agents, setAgents] = useState([]);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const [newAgent, setNewAgent] = useState({ name: '', license: '', calId: '' });
-  const [newProp, setNewProp] = useState({ address: '', price: '', specs: '' });
+  const [newAgent, setNewAgent] = useState({ name: '', license: '', calId: '', hours: '09:00-18:00' });
+  const [newProp, setNewProp] = useState({ address: '', price: '', specs: '', lockbox: 'Lockbox 1234' });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleAddAgent = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newAgent.name.trim() || !newAgent.license.trim() || !newAgent.calId.trim()) {
+      setError('Please fill in agent name, license number, and calendar email.');
+      return;
+    }
+    if (!emailRegex.test(newAgent.calId.trim())) {
+      setError('Please enter a valid Google Calendar email address.');
+      return;
+    }
+
     setLoading(true);
     const agentId = `AGT-${Date.now()}`;
-    const row = [agentId, user.clientId, newAgent.name, newAgent.license, newAgent.calId, "09:00-18:00", "ACTIVE"];
+    const row = [agentId, user.clientId, newAgent.name.trim(), newAgent.license.trim(), newAgent.calId.trim(), (newAgent.hours.trim() || "09:00-18:00"), "ACTIVE"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Agents_LeasingStaff', row);
       setAgents([...agents, { agentId, ...newAgent }]);
-      setNewAgent({ name: '', license: '', calId: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewAgent({ name: '', license: '', calId: '', hours: '09:00-18:00' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddProp = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newProp.address.trim() || !newProp.price || !newProp.specs) {
+      setError('Please fill in property address, price, and specs.');
+      return;
+    }
+
     setLoading(true);
     const propId = `PRP-${Date.now()}`;
-    const row = [propId, user.clientId, newProp.address, newProp.price, newProp.specs, "AGT-01", "Lockbox 1234"];
+    const row = [propId, user.clientId, newProp.address.trim(), String(newProp.price), newProp.specs.trim(), "AGT-01", (newProp.lockbox.trim() || "Lockbox 1234")];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Property_Listings', row);
       setProperties([...properties, { propId, ...newProp }]);
-      setNewProp({ address: '', price: '', specs: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewProp({ address: '', price: '', specs: '', lockbox: 'Lockbox 1234' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

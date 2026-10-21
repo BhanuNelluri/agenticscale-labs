@@ -7,34 +7,63 @@ export default function SalonDashboard({ user, setUser }) {
   const [staff, setStaff] = useState([]);
   const [treatments, setTreatments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const [newStaff, setNewStaff] = useState({ name: '', specialty: '', calId: '' });
-  const [newTrt, setNewTrt] = useState({ name: '', price: '', duration: '' });
+  const [newStaff, setNewStaff] = useState({ name: '', specialty: '', calId: '', hours: '09:00-17:00' });
+  const [newTrt, setNewTrt] = useState({ name: '', price: '', duration: '', preCare: 'Standard pre-care rules' });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleAddStaff = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newStaff.name.trim() || !newStaff.specialty.trim() || !newStaff.calId.trim()) {
+      setError('Please fill in aesthetician name, specialty, and calendar email.');
+      return;
+    }
+    if (!emailRegex.test(newStaff.calId.trim())) {
+      setError('Please enter a valid Google Calendar email address.');
+      return;
+    }
+
     setLoading(true);
     const staffId = `STF-${Date.now()}`;
-    const row = [staffId, user.clientId, newStaff.name, newStaff.specialty, newStaff.calId, "09:00-17:00", "ACTIVE"];
+    const row = [staffId, user.clientId, newStaff.name.trim(), newStaff.specialty.trim(), newStaff.calId.trim(), (newStaff.hours.trim() || "09:00-17:00"), "ACTIVE"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Aestheticians_Staff', row);
       setStaff([...staff, { staffId, ...newStaff }]);
-      setNewStaff({ name: '', specialty: '', calId: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewStaff({ name: '', specialty: '', calId: '', hours: '09:00-17:00' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddTrt = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newTrt.name.trim() || !newTrt.price || !newTrt.duration) {
+      setError('Please fill in treatment name, price, and duration.');
+      return;
+    }
+
     setLoading(true);
     const trtId = `TRT-${Date.now()}`;
-    const row = [trtId, user.clientId, newTrt.name, newTrt.price, newTrt.duration, "Standard pre-care rules", "ALL", "Facial treatment"];
+    const row = [trtId, user.clientId, newTrt.name.trim(), String(newTrt.price), String(newTrt.duration), (newTrt.preCare.trim() || "Standard pre-care rules"), "ALL", "Facial treatment"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Treatments_Catalog', row);
       setTreatments([...treatments, { trtId, ...newTrt }]);
-      setNewTrt({ name: '', price: '', duration: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewTrt({ name: '', price: '', duration: '', preCare: 'Standard pre-care rules' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

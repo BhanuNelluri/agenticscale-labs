@@ -7,34 +7,63 @@ export default function VetDashboard({ user, setUser }) {
   const [vets, setVets] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const [newVet, setNewVet] = useState({ name: '', focus: '', calId: '' });
-  const [newSvc, setNewSvc] = useState({ name: '', price: '', duration: '' });
+  const [newVet, setNewVet] = useState({ name: '', focus: '', calId: '', hours: '08:00-17:00' });
+  const [newSvc, setNewSvc] = useState({ name: '', price: '', duration: '', fasting: 'Standard wellness exam check' });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleAddVet = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newVet.name.trim() || !newVet.focus.trim() || !newVet.calId.trim()) {
+      setError('Please fill in veterinarian name, focus area, and calendar email.');
+      return;
+    }
+    if (!emailRegex.test(newVet.calId.trim())) {
+      setError('Please enter a valid Google Calendar email address.');
+      return;
+    }
+
     setLoading(true);
     const vetId = `VET-${Date.now()}`;
-    const row = [vetId, user.clientId, newVet.name, newVet.focus, newVet.calId, "08:00-17:00", "ACTIVE"];
+    const row = [vetId, user.clientId, newVet.name.trim(), newVet.focus.trim(), newVet.calId.trim(), (newVet.hours.trim() || "08:00-17:00"), "ACTIVE"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Veterinarians_Staff', row);
       setVets([...vets, { vetId, ...newVet }]);
-      setNewVet({ name: '', focus: '', calId: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewVet({ name: '', focus: '', calId: '', hours: '08:00-17:00' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddSvc = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newSvc.name.trim() || !newSvc.price || !newSvc.duration) {
+      setError('Please fill in service name, price, and duration.');
+      return;
+    }
+
     setLoading(true);
     const svcId = `EXM-${Date.now()}`;
-    const row = [svcId, user.clientId, newSvc.name, newSvc.price, newSvc.duration, "Standard wellness exam check", "Pet exam service"];
+    const row = [svcId, user.clientId, newSvc.name.trim(), String(newSvc.price), String(newSvc.duration), (newSvc.fasting.trim() || "Standard wellness exam check"), "Pet exam service"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Vet_Services', row);
       setServices([...services, { svcId, ...newSvc }]);
-      setNewSvc({ name: '', price: '', duration: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewSvc({ name: '', price: '', duration: '', fasting: 'Standard wellness exam check' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -7,34 +7,63 @@ export default function GymDashboard({ user, setUser }) {
   const [trainers, setTrainers] = useState([]);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const [newTrainer, setNewTrainer] = useState({ name: '', expertise: '', calId: '' });
-  const [newPlan, setNewPlan] = useState({ name: '', fee: '', term: '' });
+  const [newTrainer, setNewTrainer] = useState({ name: '', expertise: '', calId: '', hours: '06:00-21:00' });
+  const [newPlan, setNewPlan] = useState({ name: '', fee: '', term: '', benefits: 'Full gym access' });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleAddTrainer = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newTrainer.name.trim() || !newTrainer.expertise.trim() || !newTrainer.calId.trim()) {
+      setError('Please fill in coach name, specialty/classes, and calendar email.');
+      return;
+    }
+    if (!emailRegex.test(newTrainer.calId.trim())) {
+      setError('Please enter a valid Google Calendar email address.');
+      return;
+    }
+
     setLoading(true);
     const coachId = `COA-${Date.now()}`;
-    const row = [coachId, user.clientId, newTrainer.name, newTrainer.expertise, newTrainer.calId, "06:00-21:00", "ACTIVE"];
+    const row = [coachId, user.clientId, newTrainer.name.trim(), newTrainer.expertise.trim(), newTrainer.calId.trim(), (newTrainer.hours.trim() || "06:00-21:00"), "ACTIVE"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Coaches_Trainers', row);
       setTrainers([...trainers, { coachId, ...newTrainer }]);
-      setNewTrainer({ name: '', expertise: '', calId: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewTrainer({ name: '', expertise: '', calId: '', hours: '06:00-21:00' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddPlan = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newPlan.name.trim() || !newPlan.fee || !newPlan.term) {
+      setError('Please fill in plan name, monthly fee, and contract term.');
+      return;
+    }
+
     setLoading(true);
     const planId = `PLN-${Date.now()}`;
-    const row = [planId, user.clientId, newPlan.name, newPlan.fee, "0", newPlan.term, "Full gym access"];
+    const row = [planId, user.clientId, newPlan.name.trim(), String(newPlan.fee), "0", String(newPlan.term), (newPlan.benefits.trim() || "Full gym access")];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Membership_Plans', row);
       setPlans([...plans, { planId, ...newPlan }]);
-      setNewPlan({ name: '', fee: '', term: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewPlan({ name: '', fee: '', term: '', benefits: 'Full gym access' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

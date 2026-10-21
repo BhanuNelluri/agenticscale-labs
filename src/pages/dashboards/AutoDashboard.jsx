@@ -7,34 +7,63 @@ export default function AutoDashboard({ user, setUser }) {
   const [techs, setTechs] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const [newTech, setNewTech] = useState({ name: '', certs: '', calId: '' });
-  const [newSvc, setNewSvc] = useState({ name: '', price: '', duration: '' });
+  const [newTech, setNewTech] = useState({ name: '', certs: '', calId: '', hours: '08:00-17:00' });
+  const [newSvc, setNewSvc] = useState({ name: '', price: '', duration: '', notes: 'Standard parts check' });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleAddTech = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newTech.name.trim() || !newTech.certs.trim() || !newTech.calId.trim()) {
+      setError('Please fill in mechanic name, ASE certifications, and calendar email.');
+      return;
+    }
+    if (!emailRegex.test(newTech.calId.trim())) {
+      setError('Please enter a valid Google Calendar email address.');
+      return;
+    }
+
     setLoading(true);
     const techId = `MEC-${Date.now()}`;
-    const row = [techId, user.clientId, newTech.name, newTech.certs, newTech.calId, "08:00-17:00", "ACTIVE"];
+    const row = [techId, user.clientId, newTech.name.trim(), newTech.certs.trim(), newTech.calId.trim(), (newTech.hours.trim() || "08:00-17:00"), "ACTIVE"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Mechanics_Techs', row);
       setTechs([...techs, { techId, ...newTech }]);
-      setNewTech({ name: '', certs: '', calId: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewTech({ name: '', certs: '', calId: '', hours: '08:00-17:00' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddSvc = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!newSvc.name.trim() || !newSvc.price || !newSvc.duration) {
+      setError('Please fill in service package name, price, and duration.');
+      return;
+    }
+
     setLoading(true);
     const svcId = `REP-${Date.now()}`;
-    const row = [svcId, user.clientId, newSvc.name, newSvc.price, newSvc.duration, "Standard parts check", "Auto repair service"];
+    const row = [svcId, user.clientId, newSvc.name.trim(), String(newSvc.price), String(newSvc.duration), (newSvc.notes.trim() || "Standard parts check"), "Auto repair service"];
 
     try {
       await apiWriteRecord(user.spreadsheetId, 'Service_Packages', row);
       setServices([...services, { svcId, ...newSvc }]);
-      setNewSvc({ name: '', price: '', duration: '' });
-    } catch (err) { alert('Sync failed.'); } finally { setLoading(false); }
+      setNewSvc({ name: '', price: '', duration: '', notes: 'Standard parts check' });
+    } catch (err) {
+      setError(err?.message || 'Sync failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
