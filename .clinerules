@@ -1,0 +1,6 @@
+# AgenticScale Labs - Tech Stack Rules
+
+- Architecture: React frontend + Google Apps Script (`Code.js`) backend
+- Database: 8 industry Google Sheets
+- MCP Tools Available: Composio (Sheets/GitHub), Retell.ai, Make.com
+- Workflow: Always verify code, run `npm run build` to confirm zero errors, and stage/commit updates cleanly.
