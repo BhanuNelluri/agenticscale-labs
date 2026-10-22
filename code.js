@@ -69,6 +69,22 @@ function doPost(e) {
 }
 
 // ============================================================================
+// ============================================================================
+// CRYPTO / HASHING HELPERS (SHA-256 for secure password hashing)
+// ============================================================================
+function hashPassword(password) {
+  const rawHash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, password, Utilities.Charset.UTF_8);
+  var output = "";
+  for (var i = 0; i < rawHash.length; i++) {
+    var byteValue = rawHash[i];
+    if (byteValue < 0) byteValue += 256;
+    var byteString = byteValue.toString(16);
+    if (byteString.length == 1) byteString = "0" + byteString;
+    output += byteString;
+  }
+  return output;
+}
+
 // VALUE HELPERS (nullability / Sheets coercion guards)
 // ============================================================================
 function cleanString(value) {
@@ -190,7 +206,7 @@ function handleRegister(data) {
       phone,
       businessName,
       industry,
-      password,
+      hashPassword(password),
       "cus_free_trial",
       DEFAULT_PLAN,
       "ACTIVE",
@@ -246,7 +262,9 @@ function handleLogin(data) {
 
   for (let i = 1; i < accounts.length; i++) {
     // Owner_Email is column index 2 (C), Web_Portal_Password_Hash is column index 6 (G)
-    if (normalizeEmail(accounts[i][2]) === email && String(accounts[i][6]) === password) {
+    const storedHash = String(accounts[i][6]);
+    const inputHash = hashPassword(password);
+    if (normalizeEmail(accounts[i][2]) === email && (storedHash === password || storedHash === inputHash)) {
       const clientId = cleanString(accounts[i][0]);
       const industry = cleanString(accounts[i][5]);
 
