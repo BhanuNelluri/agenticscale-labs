@@ -257,6 +257,8 @@ function handleRegister(data) {
   } finally {
     lock.releaseLock();
   }
+}
+
 function handleSendOtp(data) {
   const email = normalizeEmail(data.email);
   if (!email) return jsonResponse({ status: "error", message: "Email is required." });
@@ -345,8 +347,6 @@ function handleResetPassword(data) {
   }
 
   return jsonResponse({ status: "error", message: "Account not found." });
-}
-
 }
 
 function handleLogin(data) {
