@@ -11,9 +11,9 @@ export default function ClinicDashboard({ user, setUser }) {
   const [fetching, setFetching] = useState(false);
 
   const [profile, setProfile] = useState({
-    clinicName: user?.businessName || '', address: '100 Medical Center Way', hours: '08:00 - 17:00 Mon-Fri',
-    acceptedInsurance: 'Delta Dental, Cigna, MetLife', copayPolicy: '$40 copay required', cancellationPolicy: '24-hr notice required',
-    triageRules: 'Route acute pain to dentist', parkingNotes: 'Structure B', email: user?.email || '', smsNumber: user?.phone || '', personaNotes: 'Professional receptionist'
+    clinicName: user?.businessName || '', address: '', hours: '',
+    acceptedInsurance: '', copayPolicy: '', cancellationPolicy: '',
+    triageRules: '', parkingNotes: '', email: user?.email || '', smsNumber: user?.phone || '', personaNotes: ''
   });
 
   const [doctors, setDoctors] = useState([]);
@@ -38,10 +38,16 @@ export default function ClinicDashboard({ user, setUser }) {
           });
         }
         if (res.data.Doctors_Staff && res.data.Doctors_Staff.length > 1) {
-          setDoctors(res.data.Doctors_Staff.slice(1).map(r => ({ staffId: r[0], clientId: r[1], name: r[2], specialty: r[3], license: r[4], calId: r[5], hours: r[6] })));
+          setDoctors(res.data.Doctors_Staff.slice(1).map(r => ({
+            staffId: r[0], clientId: r[1], name: r[2], specialty: r[3], license: r[4], calId: r[5],
+            hours: r[6], acceptsNew: r[7] || 'YES', maxDaily: r[8] || '12', status: r[9] || 'ACTIVE'
+          })));
         }
         if (res.data.Services_Catalog && res.data.Services_Catalog.length > 1) {
-          setServices(res.data.Services_Catalog.slice(1).map(r => ({ svcId: r[0], clientId: r[1], name: r[2], price: r[3], duration: r[4], instructions: r[5] })));
+          setServices(res.data.Services_Catalog.slice(1).map(r => ({
+            svcId: r[0], clientId: r[1], name: r[2], price: r[3], duration: r[4],
+            instructions: r[5], doctorIds: r[6] || 'ALL', insuranceCovered: r[7] || 'TRUE', description: r[8] || ''
+          })));
         }
         if (res.data.LOGS_Clinics && res.data.LOGS_Clinics.length > 1) {
           setLogs(res.data.LOGS_Clinics.slice(1).map(r => ({ logId: r[0], timestamp: r[1], callerName: r[3], callerPhone: r[4], insurance: r[6], doctor: r[7], service: r[8], slotTime: r[9], status: r[11], summary: r[13], action: r[14] })).reverse());

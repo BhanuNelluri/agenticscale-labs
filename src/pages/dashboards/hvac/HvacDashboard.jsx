@@ -11,9 +11,9 @@ export default function HvacDashboard({ user, setUser }) {
   const [fetching, setFetching] = useState(false);
 
   const [profile, setProfile] = useState({
-    companyName: user?.businessName || '', zipCodes: '90210, 90211', hours: '24/7 Emergency Dispatch',
-    calloutFee: '99', emergencySurcharge: '150', overtimePolicy: 'Time-and-a-half after 18:00',
-    licenseInfo: 'HVAC-Lic #884912', email: user?.email || '', dispatchSms: user?.phone || ''
+    companyName: user?.businessName || '', zipCodes: '', hours: '',
+    calloutFee: '', emergencySurcharge: '', overtimePolicy: '',
+    licenseInfo: '', email: user?.email || '', dispatchSms: user?.phone || ''
   });
 
   const [techs, setTechs] = useState([]);

@@ -5,7 +5,7 @@ import { apiWriteRecord, apiUpdateRecord, apiDeleteRecord } from '../../../servi
 export default function ClinicCatalogTab({ user, services, reload }) {
   const [svcModal, setSvcModal] = useState(false);
   const [editingSvcId, setEditingSvcId] = useState(null);
-  const [svcForm, setSvcForm] = useState({ name: '', price: '', duration: '', instructions: '' });
+  const [svcForm, setSvcForm] = useState({ name: '', price: '', duration: '', instructions: '', insuranceCovered: 'TRUE', description: 'Standard Treatment' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -16,7 +16,10 @@ export default function ClinicCatalogTab({ user, services, reload }) {
     }
     setLoading(true);
     const svcId = editingSvcId || `SVC-${Date.now()}`;
-    const row = [svcId, user.clientId, svcForm.name.trim(), String(svcForm.price), String(svcForm.duration), (svcForm.instructions.trim() || 'None'), 'ALL', 'TRUE', 'Standard Treatment'];
+    const row = [
+      svcId, user.clientId, svcForm.name.trim(), String(svcForm.price), String(svcForm.duration),
+      (svcForm.instructions.trim() || 'None'), 'ALL', svcForm.insuranceCovered, (svcForm.description.trim() || 'Standard Treatment')
+    ];
 
     try {
       if (editingSvcId) await apiUpdateRecord(user.spreadsheetId, 'Services_Catalog', editingSvcId, row);
@@ -69,15 +72,19 @@ export default function ClinicCatalogTab({ user, services, reload }) {
             <h3 className="text-base font-bold text-white">{editingSvcId ? 'Edit Procedure' : 'Add Procedure'}</h3>
             {error && <div className="p-2 bg-red-500/10 text-red-400 text-center rounded">{error}</div>}
             <form onSubmit={handleSaveService} className="space-y-3">
-              <input type="text" required value={svcForm.name} onChange={(e)=>setSvcForm({...svcForm, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl" placeholder="Procedure Name" />
+              <input type="text" required value={svcForm.name} onChange={(e)=>setSvcForm({...svcForm, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl outline-none" placeholder="Procedure Name" />
               <div className="grid grid-cols-2 gap-2">
-                <input type="number" step="0.01" min="0" required value={svcForm.price} onChange={(e)=>setSvcForm({...svcForm, price: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl" placeholder="Price ($ USD)" />
-                <input type="number" min="1" required value={svcForm.duration} onChange={(e)=>setSvcForm({...svcForm, duration: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl" placeholder="Duration (Mins)" />
+                <input type="number" step="0.01" min="0" required value={svcForm.price} onChange={(e)=>setSvcForm({...svcForm, price: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl outline-none" placeholder="Price ($ USD)" />
+                <input type="number" min="1" required value={svcForm.duration} onChange={(e)=>setSvcForm({...svcForm, duration: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl outline-none" placeholder="Duration (Mins)" />
               </div>
-              <input type="text" value={svcForm.instructions} onChange={(e)=>setSvcForm({...svcForm, instructions: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl" placeholder="Pre-Appointment Instructions" />
+              <input type="text" value={svcForm.instructions} onChange={(e)=>setSvcForm({...svcForm, instructions: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl outline-none" placeholder="Pre-Appointment Instructions" />
+              <div className="grid grid-cols-2 gap-2">
+                <div><label className="block text-[10px] text-slate-500 mb-1">Insurance Covered</label><select value={svcForm.insuranceCovered} onChange={(e)=>setSvcForm({...svcForm, insuranceCovered: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2 rounded-xl outline-none text-slate-200 cursor-pointer"><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option></select></div>
+                <div><label className="block text-[10px] text-slate-500 mb-1">Category / Description</label><input type="text" value={svcForm.description} onChange={(e)=>setSvcForm({...svcForm, description: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-2 rounded-xl outline-none text-slate-200" placeholder="e.g. Preventative" /></div>
+              </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={()=>setSvcModal(false)} className="flex-1 py-2 bg-slate-800 font-bold rounded-xl text-slate-300">Cancel</button>
-                <button type="submit" disabled={loading} className="flex-1 py-2 bg-blue-600 font-bold rounded-xl text-white">{loading ? "Saving..." : "Save"}</button>
+                <button type="button" onClick={()=>setSvcModal(false)} className="flex-1 py-2 bg-slate-800 font-bold rounded-xl text-slate-300 cursor-pointer">Cancel</button>
+                <button type="submit" disabled={loading} className="flex-1 py-2 bg-blue-600 font-bold rounded-xl text-white cursor-pointer">{loading ? "Saving..." : "Save"}</button>
               </div>
             </form>
           </div>
