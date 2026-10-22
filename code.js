@@ -141,16 +141,21 @@ function appendRowSafe(sheet, row, forceTextCols) {
   sheet.getRange(rowNum, 1, 1, safeRow.length).setValues([safeRow]);
 }
 
-// Multi-tenant guard: only spreadsheets provisioned through Phone_Registry may be read or written.
+// Multi-tenant guard: all industry master spreadsheets and the central master registry are permitted.
 function isRegisteredSpreadsheet(spreadsheetId) {
   const id = cleanString(spreadsheetId);
   if (!id) return false;
+  if (id === MASTER_SHEET_ID) return true;
+  for (var key in TEMPLATE_SHEETS) {
+    if (TEMPLATE_SHEETS[key] === id) return true;
+  }
   const registries = SpreadsheetApp.openById(MASTER_SHEET_ID).getSheetByName("Phone_Registry").getDataRange().getValues();
   for (let i = 1; i < registries.length; i++) {
     if (cleanString(registries[i][5]) === id) return true;
   }
   return false;
 }
+
 
 // ============================================================================
 // HANDLERS
@@ -185,11 +190,8 @@ function handleRegister(data) {
       }
     }
 
-    // 1. Duplicate pre-formatted industry template sheet
-    const templateFile = DriveApp.getFileById(TEMPLATE_SHEETS[industry]);
-    const newSheetFile = templateFile.makeCopy(businessName + " - Database");
-    const provisionedSheetId = newSheetFile.getId();
-    newSheetFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT);
+    // 1. Use the shared central master industry template spreadsheet directly (no file duplication)
+    const provisionedSheetId = TEMPLATE_SHEETS[industry] || TEMPLATE_SHEETS["Clinics & Healthcare"];
 
     // 2. Provision IDs and Inbound Line (placeholders until the owner saves real Retell values on /deploy)
     const retellAgentId = RETELL_AGENT_MAP[industry] || "agent_default_v1";
