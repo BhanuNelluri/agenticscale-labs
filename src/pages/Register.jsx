@@ -26,7 +26,7 @@ export default function Register({ setUser }) {
       const res = await apiSendOtp(formData.email.trim().toLowerCase());
       if (res && res.status === 'success') {
         setOtpSent(true);
-        setSuccessMsg(res.mockOtp ? `Verification code sent! (Mock: ${res.mockOtp})` : 'Verification code sent to your email.');
+        setSuccessMsg('Verification code sent to your email.');
       } else { setError(res?.message || 'Failed to send OTP.'); }
     } catch (err) { setError('Failed to connect to backend.'); } finally { setLoading(false); }
   };
@@ -79,7 +79,7 @@ export default function Register({ setUser }) {
         {successMsg && <div className="mb-4 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-center font-medium flex items-center justify-center gap-2"><CheckCircle2 className="w-4 h-4" /> {successMsg}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-slate-400 font-semibold mb-1">Owner Full Name</label>
               <input type="text" required value={formData.ownerName} onChange={(e)=>setFormData({...formData, ownerName: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="John Doe" />
@@ -103,7 +103,7 @@ export default function Register({ setUser }) {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-slate-400 font-semibold mb-1">Password</label>
               <div className="relative">
@@ -119,7 +119,7 @@ export default function Register({ setUser }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-slate-400 font-semibold mb-1">Industry Niche</label>
               <select value={formData.industry} onChange={(e)=>setFormData({...formData, industry: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-200 outline-none cursor-pointer">
@@ -134,11 +134,11 @@ export default function Register({ setUser }) {
             </div>
             <div>
               <label className="block text-slate-400 font-semibold mb-1">Business Phone</label>
-              <div className="flex gap-2">
-                <select value={countryCode} onChange={(e)=>setCountryCode(e.target.value)} className="bg-slate-950 border border-slate-800 px-2 py-3 rounded-xl text-slate-200 font-mono cursor-pointer outline-none">
+              <div className="flex min-w-0 gap-2">
+                <select value={countryCode} onChange={(e)=>setCountryCode(e.target.value)} className="shrink-0 bg-slate-950 border border-slate-800 px-2 py-3 rounded-xl text-slate-200 font-mono cursor-pointer outline-none">
                   <option value="+1">+1 (US)</option><option value="+44">+44 (UK)</option><option value="+61">+61 (AU)</option><option value="+91">+91 (IN)</option><option value="+49">+49 (DE)</option>
                 </select>
-                <input type="text" required value={phoneDigits} onChange={(e)=>setPhoneDigits(e.target.value)} className="flex-1 bg-slate-950 border border-slate-800 p-3 rounded-xl font-mono outline-none focus:border-blue-500" placeholder="2025550143" />
+                <input type="text" required value={phoneDigits} onChange={(e)=>setPhoneDigits(e.target.value)} className="min-w-0 w-full flex-1 bg-slate-950 border border-slate-800 p-3 rounded-xl font-mono outline-none focus:border-blue-500" placeholder="2025550143" />
               </div>
             </div>
           </div>

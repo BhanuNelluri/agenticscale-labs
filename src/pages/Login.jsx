@@ -49,7 +49,7 @@ export default function Login({ setUser }) {
       const res = await apiForgotPassword(email.trim().toLowerCase());
       if (res && res.status === 'success') {
         setMode('reset');
-        setSuccessMsg(res.mockOtp ? `Reset code sent! (Mock: ${res.mockOtp})` : 'Reset code sent to your email.');
+        setSuccessMsg('Reset code sent to your email.');
       } else {
         setError(res?.message || 'Email not found.');
       }

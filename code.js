@@ -275,8 +275,10 @@ function handleSendOtp(data) {
     );
     return jsonResponse({ status: "success", message: "OTP sent successfully." });
   } catch (err) {
-    // Fallback if email quota or permissions fail in test environment
-    return jsonResponse({ status: "success", message: "OTP generated successfully (Mock email sent).", mockOtp: otp });
+    PropertiesService.getScriptProperties().deleteProperty("OTP_" + email);
+    PropertiesService.getScriptProperties().deleteProperty("OTP_TIME_" + email);
+    Logger.log("OTP email delivery failed: " + String(err));
+    return jsonResponse({ status: "error", message: "Unable to send OTP email. Check the mail service configuration and try again." });
   }
 }
 

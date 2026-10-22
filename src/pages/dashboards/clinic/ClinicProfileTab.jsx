@@ -72,12 +72,32 @@ export default function ClinicProfileTab({ user, profile, setProfile }) {
             <p className="font-semibold text-blue-400">{profile.acceptedInsurance || 'Self-pay only'}</p>
           </div>
           <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">Payment & Copay Policy</span>
+            <p className="font-semibold text-slate-200 whitespace-pre-wrap">{profile.copayPolicy || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">Cancellation Policy</span>
+            <p className="font-semibold text-slate-200 whitespace-pre-wrap">{profile.cancellationPolicy || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">Emergency Triage Rules</span>
+            <p className="font-semibold text-slate-200 whitespace-pre-wrap">{profile.triageRules || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">Parking & Directions</span>
+            <p className="font-semibold text-slate-200 whitespace-pre-wrap">{profile.parkingNotes || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
             <span className="text-[10px] text-slate-500 uppercase font-semibold">Notification Email</span>
             <p className="font-mono text-slate-300">{profile.email || 'None'}</p>
           </div>
           <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
             <span className="text-[10px] text-slate-500 uppercase font-semibold">Emergency SMS Phone</span>
             <p className="font-mono text-emerald-400 font-semibold">{profile.smsNumber || 'Not configured'}</p>
+          </div>
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1 col-span-2">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">AI Receptionist Persona Notes</span>
+            <p className="font-semibold text-slate-200 whitespace-pre-wrap">{profile.personaNotes || 'Not specified'}</p>
           </div>
         </div>
       ) : (
@@ -90,8 +110,16 @@ export default function ClinicProfileTab({ user, profile, setProfile }) {
           <div><label className="block text-slate-400 font-semibold mb-1">Physical Address</label><input type="text" required value={profile.address} onChange={(e) => setProfile({...profile, address: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="100 Medical Center Way" /></div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-slate-400 font-semibold mb-1">Operating Hours</label><input type="text" required value={profile.hours} onChange={(e) => setProfile({...profile, hours: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="08:00 - 17:00 Mon-Fri" /></div>
+          <div><label className="block text-slate-400 font-semibold mb-1">Operating Hours</label><input type="text" required value={profile.hours} onChange={(e) => setProfile({...profile, hours: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Mon-Fri 08:00-17:00; Sat Closed; Sun Closed" /><p className="mt-1 text-[10px] text-slate-500">Use 24-hour HH:mm times and day ranges. Saved as entered in the Operating_Hours sheet column.</p></div>
           <div><label className="block text-slate-400 font-semibold mb-1">Accepted Insurance Providers</label><input type="text" required value={profile.acceptedInsurance} onChange={(e) => setProfile({...profile, acceptedInsurance: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Delta Dental, Cigna" /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div><label className="block text-slate-400 font-semibold mb-1">Payment & Copay Policy</label><textarea value={profile.copayPolicy} onChange={(e) => setProfile({...profile, copayPolicy: e.target.value})} className="w-full min-h-24 bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Payment methods, copays, and billing details" /></div>
+          <div><label className="block text-slate-400 font-semibold mb-1">Cancellation Fee Policy</label><textarea value={profile.cancellationPolicy} onChange={(e) => setProfile({...profile, cancellationPolicy: e.target.value})} className="w-full min-h-24 bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Notice period and applicable fees" /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div><label className="block text-slate-400 font-semibold mb-1">Emergency Triage Rules</label><textarea value={profile.triageRules} onChange={(e) => setProfile({...profile, triageRules: e.target.value})} className="w-full min-h-24 bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Escalation guidance for urgent symptoms" /></div>
+          <div><label className="block text-slate-400 font-semibold mb-1">Parking & Directions</label><textarea value={profile.parkingNotes} onChange={(e) => setProfile({...profile, parkingNotes: e.target.value})} className="w-full min-h-24 bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Parking, entrance, and arrival instructions" /></div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div><label className="block text-slate-400 font-semibold mb-1">Notification Email</label><input type="email" required value={profile.email} onChange={(e) => setProfile({...profile, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="admin@clinic.com" /></div>
@@ -105,6 +133,7 @@ export default function ClinicProfileTab({ user, profile, setProfile }) {
             </div>
           </div>
         </div>
+        <div><label className="block text-slate-400 font-semibold mb-1">AI Receptionist Persona Notes</label><textarea value={profile.personaNotes} onChange={(e) => setProfile({...profile, personaNotes: e.target.value})} className="w-full min-h-24 bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="Tone, call flow, and service guidance" /></div>
         <div className="flex gap-3">
           {profile.address && (
             <button type="button" onClick={() => setIsEditing(false)} className="px-5 py-3 bg-slate-800 font-bold rounded-xl text-slate-300 cursor-pointer">Cancel</button>

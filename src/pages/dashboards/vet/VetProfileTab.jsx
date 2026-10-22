@@ -47,6 +47,13 @@ export default function VetProfileTab({ user, profile, setProfile }) {
         <div className="grid grid-cols-2 gap-4">
           <div><label className="block text-slate-400 mb-1">After-Hours Emergency Hospital Phone</label><input type="text" required value={profile.emergencyPhone} onChange={(e)=>setProfile({...profile, emergencyPhone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl" placeholder="+12025550143" /></div>
           <div><label className="block text-slate-400 mb-1">Notification Email</label><input type="email" required value={profile.email} onChange={(e)=>setProfile({...profile, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl" /></div>
+          <div>
+            <label className="block text-slate-400 mb-1">Rabies Vaccine Requirement</label>
+            <select value={profile.rabiesRequired} onChange={(e)=>setProfile({...profile, rabiesRequired: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-200 outline-none cursor-pointer">
+              <option value="YES">Required</option>
+              <option value="NO">Not required</option>
+            </select>
+          </div>
         </div>
         <button type="submit" disabled={loading} className="px-6 py-3 bg-teal-600 font-bold rounded-xl text-white">{loading ? "Saving..." : "Save Vet Profile"}</button>
       </form>

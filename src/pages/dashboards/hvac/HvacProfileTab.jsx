@@ -72,6 +72,14 @@ export default function HvacProfileTab({ user, profile, setProfile }) {
             <p className="font-mono text-amber-400 font-bold">${profile.calloutFee || 0} base / ${profile.emergencySurcharge || 0} emergency</p>
           </div>
           <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">Overtime Hours Policy</span>
+            <p className="font-semibold text-slate-200 whitespace-pre-wrap">{profile.overtimePolicy || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">License & Insurance Information</span>
+            <p className="font-semibold text-slate-200 whitespace-pre-wrap">{profile.licenseInfo || 'Not specified'}</p>
+          </div>
+          <div className="p-4 bg-slate-950/70 border border-slate-800/80 rounded-xl space-y-1">
             <span className="text-[10px] text-slate-500 uppercase font-semibold">Notification Email</span>
             <p className="font-mono text-slate-300">{profile.email || 'None'}</p>
           </div>
@@ -104,6 +112,16 @@ export default function HvacProfileTab({ user, profile, setProfile }) {
             <div>
               <label className="block text-slate-400 mb-1">Emergency Surcharge ($)</label>
               <input type="number" step="0.01" min="0" required value={profile.emergencySurcharge} onChange={(e)=>setProfile({...profile, emergencySurcharge: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-amber-500" placeholder="e.g. 150" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-slate-400 mb-1">Overtime Hours Policy</label>
+              <textarea value={profile.overtimePolicy} onChange={(e)=>setProfile({...profile, overtimePolicy: e.target.value})} className="w-full min-h-24 bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-amber-500" placeholder="After-hours and overtime rates or rules" />
+            </div>
+            <div>
+              <label className="block text-slate-400 mb-1">License & Insurance Information</label>
+              <textarea value={profile.licenseInfo} onChange={(e)=>setProfile({...profile, licenseInfo: e.target.value})} className="w-full min-h-24 bg-slate-950 border border-slate-800 p-3 rounded-xl outline-none focus:border-amber-500" placeholder="License numbers and coverage details" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
