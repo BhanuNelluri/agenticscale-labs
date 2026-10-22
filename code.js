@@ -427,14 +427,23 @@ function handleSaveProfile(data) {
   }
 
   const lastRow = sheet.getLastRow();
+  const headerCount = sheet.getLastColumn() || data.rowArray.length;
+
+  // Pad or trim rowArray to match exact header width
+  let rowToSave = data.rowArray.slice(0, headerCount);
+  while (rowToSave.length < headerCount) {
+    rowToSave.push("");
+  }
+
   if (lastRow >= 2) {
-    sheet.getRange(2, 1, 1, data.rowArray.length).setValues([data.rowArray]);
+    sheet.getRange(2, 1, 1, headerCount).setValues([rowToSave]);
   } else {
-    appendRowSafe(sheet, data.rowArray);
+    appendRowSafe(sheet, rowToSave);
   }
 
   return jsonResponse({ status: "success", message: "Profile saved successfully." });
 }
+
 
 function handleFetchDashboard(data) {
   if (!isRegisteredSpreadsheet(data.spreadsheetId)) {
