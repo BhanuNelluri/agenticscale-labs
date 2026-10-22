@@ -1,4 +1,4 @@
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxBTL6xjL1jqa3yf6qhzBWdY27kzsDAkEcTtI6Mod-oatH_cg_XcMznI0tpPIEkOdgV6w/exec";
+const WEBHOOK_URL = import.meta.env.VITE_WEBHOOK_URL || "https://script.google.com/macros/s/AKfycbxBTL6xjL1jqa3yf6qhzBWdY27kzsDAkEcTtI6Mod-oatH_cg_XcMznI0tpPIEkOdgV6w/exec";
 
 export async function apiRegister(formData) {
   const response = await fetch(WEBHOOK_URL, {
