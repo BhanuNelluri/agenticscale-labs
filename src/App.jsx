@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -14,7 +14,22 @@ import VetDashboard from './pages/dashboards/vet/VetDashboard';
 import RealEstateDashboard from './pages/dashboards/realestate/RealEstateDashboard';
 
 export default function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('agenticscale_current_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('agenticscale_current_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('agenticscale_current_user');
+    }
+  }, [user]);
 
   const renderDashboardByNiche = () => {
     if (!user) return <Navigate to="/login" />;
