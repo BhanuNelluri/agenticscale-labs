@@ -52,6 +52,12 @@ function doPost(e) {
       return handleUpdateRegistry(data);
     } else if (action === "writeRecord") {
       return handleWriteRecord(data);
+    } else if (action === "updateRecord") {
+      return handleUpdateRecord(data);
+    } else if (action === "deleteRecord") {
+      return handleDeleteRecord(data);
+    } else if (action === "saveProfile") {
+      return handleSaveProfile(data);
     } else if (action === "fetchDashboard") {
       return handleFetchDashboard(data);
     }
@@ -354,6 +360,80 @@ function handleWriteRecord(data) {
 
   appendRowSafe(sheet, data.rowArray);
   return jsonResponse({ status: "success", message: "Row appended successfully." });
+}
+
+function handleUpdateRecord(data) {
+  if (!data.spreadsheetId || !data.tabName || !data.recordId || !Array.isArray(data.rowArray)) {
+    return jsonResponse({ status: "error", message: "spreadsheetId, tabName, recordId and rowArray are required." });
+  }
+  if (!isRegisteredSpreadsheet(data.spreadsheetId)) {
+    return jsonResponse({ status: "error", message: "Unknown spreadsheet." });
+  }
+
+  const targetSs = SpreadsheetApp.openById(data.spreadsheetId);
+  const sheet = targetSs.getSheetByName(data.tabName);
+  if (!sheet) {
+    return jsonResponse({ status: "error", message: "Tab not found: " + data.tabName });
+  }
+
+  const values = sheet.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    if (cleanString(values[i][0]) === cleanString(data.recordId)) {
+      sheet.getRange(i + 1, 1, 1, data.rowArray.length).setValues([data.rowArray]);
+      return jsonResponse({ status: "success", message: "Record updated successfully." });
+    }
+  }
+
+  return jsonResponse({ status: "error", message: "Record ID not found." });
+}
+
+function handleDeleteRecord(data) {
+  if (!data.spreadsheetId || !data.tabName || !data.recordId) {
+    return jsonResponse({ status: "error", message: "spreadsheetId, tabName and recordId are required." });
+  }
+  if (!isRegisteredSpreadsheet(data.spreadsheetId)) {
+    return jsonResponse({ status: "error", message: "Unknown spreadsheet." });
+  }
+
+  const targetSs = SpreadsheetApp.openById(data.spreadsheetId);
+  const sheet = targetSs.getSheetByName(data.tabName);
+  if (!sheet) {
+    return jsonResponse({ status: "error", message: "Tab not found: " + data.tabName });
+  }
+
+  const values = sheet.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    if (cleanString(values[i][0]) === cleanString(data.recordId)) {
+      sheet.deleteRow(i + 1);
+      return jsonResponse({ status: "success", message: "Record deleted successfully." });
+    }
+  }
+
+  return jsonResponse({ status: "error", message: "Record ID not found." });
+}
+
+function handleSaveProfile(data) {
+  if (!data.spreadsheetId || !data.tabName || !Array.isArray(data.rowArray)) {
+    return jsonResponse({ status: "error", message: "spreadsheetId, tabName and rowArray are required." });
+  }
+  if (!isRegisteredSpreadsheet(data.spreadsheetId)) {
+    return jsonResponse({ status: "error", message: "Unknown spreadsheet." });
+  }
+
+  const targetSs = SpreadsheetApp.openById(data.spreadsheetId);
+  const sheet = targetSs.getSheetByName(data.tabName);
+  if (!sheet) {
+    return jsonResponse({ status: "error", message: "Tab not found: " + data.tabName });
+  }
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow >= 2) {
+    sheet.getRange(2, 1, 1, data.rowArray.length).setValues([data.rowArray]);
+  } else {
+    appendRowSafe(sheet, data.rowArray);
+  }
+
+  return jsonResponse({ status: "success", message: "Profile saved successfully." });
 }
 
 function handleFetchDashboard(data) {

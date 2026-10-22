@@ -5,13 +5,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import DeployAgent from './pages/DeployAgent';
 
-import ClinicDashboard from './pages/dashboards/ClinicDashboard';
-import HvacDashboard from './pages/dashboards/HvacDashboard';
-import SalonDashboard from './pages/dashboards/SalonDashboard';
-import GymDashboard from './pages/dashboards/GymDashboard';
-import AutoDashboard from './pages/dashboards/AutoDashboard';
-import VetDashboard from './pages/dashboards/VetDashboard';
-import RealEstateDashboard from './pages/dashboards/RealEstateDashboard';
+import ClinicDashboard from './pages/dashboards/clinic/ClinicDashboard';
+import HvacDashboard from './pages/dashboards/hvac/HvacDashboard';
+import SalonDashboard from './pages/dashboards/salon/SalonDashboard';
+import GymDashboard from './pages/dashboards/gym/GymDashboard';
+import AutoDashboard from './pages/dashboards/auto/AutoDashboard';
+import VetDashboard from './pages/dashboards/vet/VetDashboard';
+import RealEstateDashboard from './pages/dashboards/realestate/RealEstateDashboard';
 
 export default function App() {
   const [user, setUser] = useState(null);
