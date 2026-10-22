@@ -1,6 +1,18 @@
-# AgenticScale Labs - Tech Stack Rules
+# AgenticScale Labs - Tech Stack & Deployment Rules
 
-- Architecture: React frontend + Google Apps Script (`Code.js`) backend
-- Database: 8 industry Google Sheets
+- Architecture: React frontend (Vercel) + Google Apps Script (`code.js` backend)
+- Database: 8 industry Google Sheets via Central Master Registry (`1JF8zJVjWer-n9RMO6Zuwzcvdu2NdSY5iPQgzVWmy1Vc`)
 - MCP Tools Available: Composio (Sheets/GitHub), Retell.ai, Make.com
-- Workflow: Always verify code, run `npm run build` to confirm zero errors, and stage/commit updates cleanly.
+
+## Automated Backend Deployment (`clasp`)
+- Script ID: `1Nv5aoev6c0jRr7Bs2VKI9g_JCuWGraw_9OQSolqCejGVj8P189J8J8L1`
+- Configuration File: `.clasp.json`
+- **To update and push backend changes to Google Apps Script**:
+  ```bash
+  npx clasp push
+  ```
+- *Prerequisite*: Run `npx clasp login` once on the machine to authenticate with the Google account owning the Apps Script project.
+
+## Workflow Rules
+- Always verify code, run `npm run build` to confirm zero frontend compilation errors, and stage/commit updates cleanly.
+- Never hardcode or expose secret API keys, tokens, or credentials in public repository files.
