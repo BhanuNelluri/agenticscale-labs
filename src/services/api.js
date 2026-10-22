@@ -80,11 +80,41 @@ export async function apiSaveProfile(spreadsheetId, tabName, rowArray) {
   return result;
 }
 
-export async function apiFetchDashboard(spreadsheetId) {
+export async function apiSendOtp(email) {
   const response = await fetch(WEBHOOK_URL, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ action: "fetchDashboard", spreadsheetId })
+    body: JSON.stringify({ action: "sendOtp", email })
   });
   return response.json();
 }
+
+export async function apiVerifyOtp(email, code) {
+  const response = await fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action: "verifyOtp", email, code })
+  });
+  return response.json();
+}
+
+export async function apiForgotPassword(email) {
+  const response = await fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action: "forgotPassword", email })
+  });
+  return response.json();
+}
+
+export async function apiResetPassword(email, code, newPassword) {
+  const response = await fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action: "resetPassword", email, code, newPassword })
+  });
+  return response.json();
+}
+
+
+export async function apiFetchDashboard(spreadsheetId) { const response = await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'fetchDashboard', spreadsheetId }) }); return response.json(); }
